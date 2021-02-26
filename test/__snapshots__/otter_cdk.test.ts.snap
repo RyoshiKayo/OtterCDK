@@ -1,0 +1,729 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Empty Stack 1`] = `
+Object {
+  "Outputs": Object {
+    "OtterAppLoadBalancerDNS3465308F": Object {
+      "Value": Object {
+        "Fn::GetAtt": Array [
+          "OtterAppLBA32F553C",
+          "DNSName",
+        ],
+      },
+    },
+  },
+  "Resources": Object {
+    "OtterAppLBA32F553C": Object {
+      "DependsOn": Array [
+        "OtterVPCPublicSubnet1DefaultRouteA56C37CE",
+        "OtterVPCPublicSubnet2DefaultRoute2DD7244A",
+      ],
+      "Properties": Object {
+        "LoadBalancerAttributes": Array [
+          Object {
+            "Key": "deletion_protection.enabled",
+            "Value": "false",
+          },
+        ],
+        "Scheme": "internet-facing",
+        "Subnets": Array [
+          Object {
+            "Ref": "OtterVPCPublicSubnet1Subnet1778C5BD",
+          },
+          Object {
+            "Ref": "OtterVPCPublicSubnet2SubnetD427F915",
+          },
+        ],
+        "Type": "network",
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+    },
+    "OtterAppLBPublicListener5D4C2C0A": Object {
+      "Properties": Object {
+        "DefaultActions": Array [
+          Object {
+            "TargetGroupArn": Object {
+              "Ref": "OtterAppLBPublicListenerECSGroup2F761497",
+            },
+            "Type": "forward",
+          },
+        ],
+        "LoadBalancerArn": Object {
+          "Ref": "OtterAppLBA32F553C",
+        },
+        "Port": 80,
+        "Protocol": "TCP",
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+    },
+    "OtterAppLBPublicListenerECSGroup2F761497": Object {
+      "Properties": Object {
+        "Port": 80,
+        "Protocol": "TCP",
+        "TargetType": "ip",
+        "VpcId": Object {
+          "Ref": "OtterVPC8616E77D",
+        },
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+    },
+    "OtterAppServiceF37F5B68": Object {
+      "DependsOn": Array [
+        "OtterAppLBPublicListenerECSGroup2F761497",
+        "OtterAppLBPublicListener5D4C2C0A",
+      ],
+      "Properties": Object {
+        "Cluster": Object {
+          "Ref": "OtterFargateF22B2342",
+        },
+        "DeploymentConfiguration": Object {
+          "MaximumPercent": 200,
+          "MinimumHealthyPercent": 50,
+        },
+        "DesiredCount": 1,
+        "EnableECSManagedTags": false,
+        "HealthCheckGracePeriodSeconds": 60,
+        "LaunchType": "FARGATE",
+        "LoadBalancers": Array [
+          Object {
+            "ContainerName": "web",
+            "ContainerPort": 80,
+            "TargetGroupArn": Object {
+              "Ref": "OtterAppLBPublicListenerECSGroup2F761497",
+            },
+          },
+        ],
+        "NetworkConfiguration": Object {
+          "AwsvpcConfiguration": Object {
+            "AssignPublicIp": "DISABLED",
+            "SecurityGroups": Array [
+              Object {
+                "Fn::GetAtt": Array [
+                  "OtterAppServiceSecurityGroup1EED6287",
+                  "GroupId",
+                ],
+              },
+            ],
+            "Subnets": Array [
+              Object {
+                "Ref": "OtterVPCPrivateSubnet1Subnet1CE01EF1",
+              },
+              Object {
+                "Ref": "OtterVPCPrivateSubnet2Subnet3B48A4F0",
+              },
+            ],
+          },
+        },
+        "TaskDefinition": Object {
+          "Ref": "OtterAppTaskDefA7F7F97C",
+        },
+      },
+      "Type": "AWS::ECS::Service",
+    },
+    "OtterAppServiceSecurityGroup1EED6287": Object {
+      "Properties": Object {
+        "GroupDescription": "MyTestStack/OtterApp/Service/SecurityGroup",
+        "SecurityGroupEgress": Array [
+          Object {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "OtterVPC8616E77D",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "OtterAppServiceTaskCountTargetB9097CDE": Object {
+      "Properties": Object {
+        "MaxCapacity": 2,
+        "MinCapacity": 1,
+        "ResourceId": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "service/",
+              Object {
+                "Ref": "OtterFargateF22B2342",
+              },
+              "/",
+              Object {
+                "Fn::GetAtt": Array [
+                  "OtterAppServiceF37F5B68",
+                  "Name",
+                ],
+              },
+            ],
+          ],
+        },
+        "RoleARN": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "arn:",
+              Object {
+                "Ref": "AWS::Partition",
+              },
+              ":iam::",
+              Object {
+                "Ref": "AWS::AccountId",
+              },
+              ":role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService",
+            ],
+          ],
+        },
+        "ScalableDimension": "ecs:service:DesiredCount",
+        "ServiceNamespace": "ecs",
+      },
+      "Type": "AWS::ApplicationAutoScaling::ScalableTarget",
+    },
+    "OtterAppServiceTaskCountTargetCpuScalingE0EBD95E": Object {
+      "Properties": Object {
+        "PolicyName": "MyTestStackOtterAppServiceTaskCountTargetCpuScaling2A50B3B7",
+        "PolicyType": "TargetTrackingScaling",
+        "ScalingTargetId": Object {
+          "Ref": "OtterAppServiceTaskCountTargetB9097CDE",
+        },
+        "TargetTrackingScalingPolicyConfiguration": Object {
+          "PredefinedMetricSpecification": Object {
+            "PredefinedMetricType": "ECSServiceAverageCPUUtilization",
+          },
+          "ScaleInCooldown": 1800,
+          "ScaleOutCooldown": 1800,
+          "TargetValue": 90,
+        },
+      },
+      "Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
+    },
+    "OtterAppServiceTaskCountTargetMemScaling6882C2CD": Object {
+      "Properties": Object {
+        "PolicyName": "MyTestStackOtterAppServiceTaskCountTargetMemScaling6821581E",
+        "PolicyType": "TargetTrackingScaling",
+        "ScalingTargetId": Object {
+          "Ref": "OtterAppServiceTaskCountTargetB9097CDE",
+        },
+        "TargetTrackingScalingPolicyConfiguration": Object {
+          "PredefinedMetricSpecification": Object {
+            "PredefinedMetricType": "ECSServiceAverageMemoryUtilization",
+          },
+          "ScaleInCooldown": 1800,
+          "ScaleOutCooldown": 1800,
+          "TargetValue": 90,
+        },
+      },
+      "Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
+    },
+    "OtterAppTaskDefA7F7F97C": Object {
+      "Properties": Object {
+        "ContainerDefinitions": Array [
+          Object {
+            "Environment": Array [
+              Object {
+                "Name": "DISCORD_BOT_TOKEN",
+                "Value": "{{resolve:secretsmanager:arn:aws:secretsmanager:us-west-2:123456789000:secret:OtterDiscordBotToken-1a2b3c:SecretString:::}}",
+              },
+            ],
+            "Essential": true,
+            "Image": "kayochuu/otter",
+            "LogConfiguration": Object {
+              "LogDriver": "awslogs",
+              "Options": Object {
+                "awslogs-group": Object {
+                  "Ref": "OtterAppTaskDefwebLogGroupE70806F6",
+                },
+                "awslogs-region": Object {
+                  "Ref": "AWS::Region",
+                },
+                "awslogs-stream-prefix": "OtterApp",
+              },
+            },
+            "Name": "web",
+            "PortMappings": Array [
+              Object {
+                "ContainerPort": 80,
+                "Protocol": "tcp",
+              },
+            ],
+          },
+        ],
+        "Cpu": "256",
+        "ExecutionRoleArn": Object {
+          "Fn::GetAtt": Array [
+            "OtterAppTaskDefExecutionRole754C16F5",
+            "Arn",
+          ],
+        },
+        "Family": "MyTestStackOtterAppTaskDefA1EA269D",
+        "Memory": "512",
+        "NetworkMode": "awsvpc",
+        "RequiresCompatibilities": Array [
+          "FARGATE",
+        ],
+        "TaskRoleArn": Object {
+          "Fn::GetAtt": Array [
+            "OtterAppTaskDefTaskRole6F644F7C",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::ECS::TaskDefinition",
+    },
+    "OtterAppTaskDefExecutionRole754C16F5": Object {
+      "Properties": Object {
+        "AssumeRolePolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": "ecs-tasks.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "OtterAppTaskDefExecutionRoleDefaultPolicyBB269E50": Object {
+      "Properties": Object {
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": Array [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+              ],
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::GetAtt": Array [
+                  "OtterAppTaskDefwebLogGroupE70806F6",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "OtterAppTaskDefExecutionRoleDefaultPolicyBB269E50",
+        "Roles": Array [
+          Object {
+            "Ref": "OtterAppTaskDefExecutionRole754C16F5",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "OtterAppTaskDefTaskRole6F644F7C": Object {
+      "Properties": Object {
+        "AssumeRolePolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": "ecs-tasks.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "OtterAppTaskDefwebLogGroupE70806F6": Object {
+      "DeletionPolicy": "Retain",
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "OtterFargateF22B2342": Object {
+      "Type": "AWS::ECS::Cluster",
+    },
+    "OtterVPC8616E77D": Object {
+      "Properties": Object {
+        "CidrBlock": "10.0.0.0/16",
+        "EnableDnsHostnames": true,
+        "EnableDnsSupport": true,
+        "InstanceTenancy": "default",
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "MyTestStack/OtterVPC",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::VPC",
+    },
+    "OtterVPCIGWD6A87F4C": Object {
+      "Properties": Object {
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "MyTestStack/OtterVPC",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::InternetGateway",
+    },
+    "OtterVPCPrivateSubnet1DefaultRoute34A83346": Object {
+      "Properties": Object {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": Object {
+          "Ref": "OtterVPCPublicSubnet1NATGateway7B23E3E5",
+        },
+        "RouteTableId": Object {
+          "Ref": "OtterVPCPrivateSubnet1RouteTable5B9D5EED",
+        },
+      },
+      "Type": "AWS::EC2::Route",
+    },
+    "OtterVPCPrivateSubnet1RouteTable5B9D5EED": Object {
+      "Properties": Object {
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "MyTestStack/OtterVPC/PrivateSubnet1",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "OtterVPC8616E77D",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "OtterVPCPrivateSubnet1RouteTableAssociationDD364BFB": Object {
+      "Properties": Object {
+        "RouteTableId": Object {
+          "Ref": "OtterVPCPrivateSubnet1RouteTable5B9D5EED",
+        },
+        "SubnetId": Object {
+          "Ref": "OtterVPCPrivateSubnet1Subnet1CE01EF1",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "OtterVPCPrivateSubnet1Subnet1CE01EF1": Object {
+      "Properties": Object {
+        "AvailabilityZone": Object {
+          "Fn::Select": Array [
+            0,
+            Object {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "CidrBlock": "10.0.128.0/18",
+        "MapPublicIpOnLaunch": false,
+        "Tags": Array [
+          Object {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Private",
+          },
+          Object {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Private",
+          },
+          Object {
+            "Key": "Name",
+            "Value": "MyTestStack/OtterVPC/PrivateSubnet1",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "OtterVPC8616E77D",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "OtterVPCPrivateSubnet2DefaultRoute11CF4479": Object {
+      "Properties": Object {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": Object {
+          "Ref": "OtterVPCPublicSubnet2NATGatewayFCEA4614",
+        },
+        "RouteTableId": Object {
+          "Ref": "OtterVPCPrivateSubnet2RouteTableA80F5009",
+        },
+      },
+      "Type": "AWS::EC2::Route",
+    },
+    "OtterVPCPrivateSubnet2RouteTableA80F5009": Object {
+      "Properties": Object {
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "MyTestStack/OtterVPC/PrivateSubnet2",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "OtterVPC8616E77D",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "OtterVPCPrivateSubnet2RouteTableAssociationA85098B6": Object {
+      "Properties": Object {
+        "RouteTableId": Object {
+          "Ref": "OtterVPCPrivateSubnet2RouteTableA80F5009",
+        },
+        "SubnetId": Object {
+          "Ref": "OtterVPCPrivateSubnet2Subnet3B48A4F0",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "OtterVPCPrivateSubnet2Subnet3B48A4F0": Object {
+      "Properties": Object {
+        "AvailabilityZone": Object {
+          "Fn::Select": Array [
+            1,
+            Object {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "CidrBlock": "10.0.192.0/18",
+        "MapPublicIpOnLaunch": false,
+        "Tags": Array [
+          Object {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Private",
+          },
+          Object {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Private",
+          },
+          Object {
+            "Key": "Name",
+            "Value": "MyTestStack/OtterVPC/PrivateSubnet2",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "OtterVPC8616E77D",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "OtterVPCPublicSubnet1DefaultRouteA56C37CE": Object {
+      "DependsOn": Array [
+        "OtterVPCVPCGW3C1B350F",
+      ],
+      "Properties": Object {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": Object {
+          "Ref": "OtterVPCIGWD6A87F4C",
+        },
+        "RouteTableId": Object {
+          "Ref": "OtterVPCPublicSubnet1RouteTable0F489DE8",
+        },
+      },
+      "Type": "AWS::EC2::Route",
+    },
+    "OtterVPCPublicSubnet1EIPF3E7ECAC": Object {
+      "Properties": Object {
+        "Domain": "vpc",
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "MyTestStack/OtterVPC/PublicSubnet1",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::EIP",
+    },
+    "OtterVPCPublicSubnet1NATGateway7B23E3E5": Object {
+      "Properties": Object {
+        "AllocationId": Object {
+          "Fn::GetAtt": Array [
+            "OtterVPCPublicSubnet1EIPF3E7ECAC",
+            "AllocationId",
+          ],
+        },
+        "SubnetId": Object {
+          "Ref": "OtterVPCPublicSubnet1Subnet1778C5BD",
+        },
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "MyTestStack/OtterVPC/PublicSubnet1",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::NatGateway",
+    },
+    "OtterVPCPublicSubnet1RouteTable0F489DE8": Object {
+      "Properties": Object {
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "MyTestStack/OtterVPC/PublicSubnet1",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "OtterVPC8616E77D",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "OtterVPCPublicSubnet1RouteTableAssociation5512113F": Object {
+      "Properties": Object {
+        "RouteTableId": Object {
+          "Ref": "OtterVPCPublicSubnet1RouteTable0F489DE8",
+        },
+        "SubnetId": Object {
+          "Ref": "OtterVPCPublicSubnet1Subnet1778C5BD",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "OtterVPCPublicSubnet1Subnet1778C5BD": Object {
+      "Properties": Object {
+        "AvailabilityZone": Object {
+          "Fn::Select": Array [
+            0,
+            Object {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "CidrBlock": "10.0.0.0/18",
+        "MapPublicIpOnLaunch": true,
+        "Tags": Array [
+          Object {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Public",
+          },
+          Object {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Public",
+          },
+          Object {
+            "Key": "Name",
+            "Value": "MyTestStack/OtterVPC/PublicSubnet1",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "OtterVPC8616E77D",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "OtterVPCPublicSubnet2DefaultRoute2DD7244A": Object {
+      "DependsOn": Array [
+        "OtterVPCVPCGW3C1B350F",
+      ],
+      "Properties": Object {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": Object {
+          "Ref": "OtterVPCIGWD6A87F4C",
+        },
+        "RouteTableId": Object {
+          "Ref": "OtterVPCPublicSubnet2RouteTable13A56DA6",
+        },
+      },
+      "Type": "AWS::EC2::Route",
+    },
+    "OtterVPCPublicSubnet2EIP2E45A5BF": Object {
+      "Properties": Object {
+        "Domain": "vpc",
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "MyTestStack/OtterVPC/PublicSubnet2",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::EIP",
+    },
+    "OtterVPCPublicSubnet2NATGatewayFCEA4614": Object {
+      "Properties": Object {
+        "AllocationId": Object {
+          "Fn::GetAtt": Array [
+            "OtterVPCPublicSubnet2EIP2E45A5BF",
+            "AllocationId",
+          ],
+        },
+        "SubnetId": Object {
+          "Ref": "OtterVPCPublicSubnet2SubnetD427F915",
+        },
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "MyTestStack/OtterVPC/PublicSubnet2",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::NatGateway",
+    },
+    "OtterVPCPublicSubnet2RouteTable13A56DA6": Object {
+      "Properties": Object {
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "MyTestStack/OtterVPC/PublicSubnet2",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "OtterVPC8616E77D",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "OtterVPCPublicSubnet2RouteTableAssociation57AE340B": Object {
+      "Properties": Object {
+        "RouteTableId": Object {
+          "Ref": "OtterVPCPublicSubnet2RouteTable13A56DA6",
+        },
+        "SubnetId": Object {
+          "Ref": "OtterVPCPublicSubnet2SubnetD427F915",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "OtterVPCPublicSubnet2SubnetD427F915": Object {
+      "Properties": Object {
+        "AvailabilityZone": Object {
+          "Fn::Select": Array [
+            1,
+            Object {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "CidrBlock": "10.0.64.0/18",
+        "MapPublicIpOnLaunch": true,
+        "Tags": Array [
+          Object {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Public",
+          },
+          Object {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Public",
+          },
+          Object {
+            "Key": "Name",
+            "Value": "MyTestStack/OtterVPC/PublicSubnet2",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "OtterVPC8616E77D",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "OtterVPCVPCGW3C1B350F": Object {
+      "Properties": Object {
+        "InternetGatewayId": Object {
+          "Ref": "OtterVPCIGWD6A87F4C",
+        },
+        "VpcId": Object {
+          "Ref": "OtterVPC8616E77D",
+        },
+      },
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+    },
+  },
+}
+`;
