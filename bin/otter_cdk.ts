@@ -2,10 +2,12 @@
 import "source-map-support/register";
 import * as cdk from "@aws-cdk/core";
 import { OtterBotStack, OtterCdkPipelineStack } from "../lib/otter_cdk-stack";
+import { pipeline } from "stream";
 
 const app = new cdk.App();
 
 const pipelineStack = new OtterCdkPipelineStack(app, "OtterBotPipelineStack");
+
 new OtterBotStack(app, "OtterBotStack", {
   image: pipelineStack.tagParameterContainerImage,
 });
