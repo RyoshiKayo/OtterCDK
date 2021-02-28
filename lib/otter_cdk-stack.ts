@@ -89,6 +89,7 @@ export class OtterCdkPipelineStack extends cdk.Stack {
           // we need to run Docker
           privileged: true,
         },
+        badge: true,
         buildSpec: codebuild.BuildSpec.fromObject({
           version: "0.2",
           phases: {
@@ -136,6 +137,7 @@ export class OtterCdkPipelineStack extends cdk.Stack {
       this,
       "RyoshiKayo-OtterCDK",
       {
+        badge: true,
         buildSpec: codebuild.BuildSpec.fromObject({
           version: "0.2",
           phases: {
