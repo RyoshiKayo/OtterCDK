@@ -138,7 +138,7 @@ export class OtterCdkPipelineStack extends cdk.Stack {
           build: {
             commands: [
               // synthesize the CDK code for the ECS application Stack
-              "npx cdk synth --verbose",
+              "npm run cdk synth --verbose",
             ],
           },
         },
