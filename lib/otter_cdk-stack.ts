@@ -1,5 +1,3 @@
-import { config } from "dotenv";
-config();
 import * as cdk from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
 import * as ecs from "@aws-cdk/aws-ecs";
@@ -20,9 +18,6 @@ export class OtterBotStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props: OtterBotStackProps) {
     super(scope, id, props);
 
-    if (!process.env.OTTER_BOT_TOKEN_SECRET_ARN)
-      throw new Error("OTTER_BOT_TOKEN_SECRET_ARN must be defined!");
-
     const vpc = new ec2.Vpc(this, "OtterVPC", { maxAzs: 2 });
     const cluster = new ecs.Cluster(this, "OtterFargate", { vpc });
 
@@ -30,7 +25,8 @@ export class OtterBotStack extends cdk.Stack {
       this,
       "OtterBotTokenSecret",
       {
-        secretCompleteArn: process.env.OTTER_BOT_TOKEN_SECRET_ARN,
+        secretCompleteArn:
+          "arn:aws:secretsmanager:us-west-2:107430322994:secret:OtterDiscordBotToken-2uuZDv",
       }
     );
 
