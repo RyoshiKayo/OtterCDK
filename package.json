@@ -30,6 +30,7 @@
     "@aws-cdk/aws-ecs-patterns": "^1.91.0",
     "@aws-cdk/aws-iam": "^1.91.0",
     "@aws-cdk/aws-kms": "^1.91.0",
+    "@aws-cdk/aws-logs": "^1.91.0",
     "@aws-cdk/aws-s3": "^1.91.0",
     "@aws-cdk/aws-secretsmanager": "^1.91.0",
     "@aws-cdk/aws-ssm": "^1.91.0",
