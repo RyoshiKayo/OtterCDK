@@ -54,14 +54,10 @@ export class OtterBotStack extends cdk.Stack {
 
     scaling.scaleOnMemoryUtilization("MemScaling", {
       targetUtilizationPercent: 90,
-      scaleInCooldown: cdk.Duration.minutes(30),
-      scaleOutCooldown: cdk.Duration.minutes(30),
     });
 
     scaling.scaleOnCpuUtilization("CpuScaling", {
       targetUtilizationPercent: 90,
-      scaleInCooldown: cdk.Duration.minutes(30),
-      scaleOutCooldown: cdk.Duration.minutes(30),
     });
   }
 }
@@ -81,7 +77,7 @@ export class OtterCdkPipelineStack extends cdk.Stack {
     // this is the ECR repository where the built Docker image will be pushed
     const appEcrRepo = new ecr.Repository(this, "OtterBotRepo");
     // the build that creates the Docker image, and pushes it to the ECR repo
-    const appCodeDockerBuild = new codebuild.PipelineProject(
+    const appCodeDockerBuild = new codebuild.Project(
       this,
       "RyoshiKayo-Otter-BuildAndPushImage",
       {
@@ -89,7 +85,6 @@ export class OtterCdkPipelineStack extends cdk.Stack {
           // we need to run Docker
           privileged: true,
         },
-        badge: true,
         buildSpec: codebuild.BuildSpec.fromObject({
           version: "0.2",
           phases: {
@@ -133,32 +128,27 @@ export class OtterCdkPipelineStack extends cdk.Stack {
       appEcrRepo
     );
 
-    const cdkCodeBuild = new codebuild.PipelineProject(
-      this,
-      "RyoshiKayo-OtterCDK",
-      {
-        badge: true,
-        buildSpec: codebuild.BuildSpec.fromObject({
-          version: "0.2",
-          phases: {
-            install: {
-              commands: ["npm install"],
-            },
-            build: {
-              commands: [
-                // synthesize the CDK code for the ECS application Stack
-                "npx cdk synth --verbose",
-              ],
-            },
+    const cdkCodeBuild = new codebuild.Project(this, "RyoshiKayo-OtterCDK", {
+      buildSpec: codebuild.BuildSpec.fromObject({
+        version: "0.2",
+        phases: {
+          install: {
+            commands: ["npm install"],
           },
-          artifacts: {
-            // store the entire Cloud Assembly as the output artifact
-            "base-directory": "cdk.out",
-            files: "**/*",
+          build: {
+            commands: [
+              // synthesize the CDK code for the ECS application Stack
+              "npx cdk synth --verbose",
+            ],
           },
-        }),
-      }
-    );
+        },
+        artifacts: {
+          // store the entire Cloud Assembly as the output artifact
+          "base-directory": "cdk.out",
+          files: "**/*",
+        },
+      }),
+    });
 
     /* ********** Pipeline part **************** */
 
