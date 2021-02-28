@@ -83,7 +83,7 @@ export class OtterCdkPipelineStack extends cdk.Stack {
     // the build that creates the Docker image, and pushes it to the ECR repo
     const appCodeDockerBuild = new codebuild.PipelineProject(
       this,
-      "OtterBotCodeDockerImageBuildAndPushProject",
+      "RyoshiKayo-Otter-BuildAndPushImage",
       {
         environment: {
           // we need to run Docker
@@ -134,7 +134,7 @@ export class OtterCdkPipelineStack extends cdk.Stack {
 
     const cdkCodeBuild = new codebuild.PipelineProject(
       this,
-      "OtterCdkCodeBuildProject",
+      "RyoshiKayo-OtterCDK",
       {
         buildSpec: codebuild.BuildSpec.fromObject({
           version: "0.2",
@@ -178,7 +178,7 @@ export class OtterCdkPipelineStack extends cdk.Stack {
           actions: [
             // this is the Action that takes the source of your application code
             new codepipeline_actions.GitHubSourceAction({
-              actionName: "OtterBotCodeSource",
+              actionName: "RyoshiKayo-Otter",
               owner: "RyoshiKayo",
               repo: "Otter",
               output: appCodeSourceOutput,
@@ -190,7 +190,7 @@ export class OtterCdkPipelineStack extends cdk.Stack {
             // this is the Action that takes the source of your CDK code
             // (which would probably include this Pipeline code as well)
             new codepipeline_actions.GitHubSourceAction({
-              actionName: "OtterCdkCodeSource",
+              actionName: "RyoshiKayo-OtterCDK",
               owner: "RyoshiKayo",
               repo: "OtterCDK",
               output: cdkCodeSourceOutput,
@@ -217,11 +217,11 @@ export class OtterCdkPipelineStack extends cdk.Stack {
           stageName: "Deploy",
           actions: [
             new codepipeline_actions.CloudFormationCreateUpdateStackAction({
-              actionName: "CFN_Deploy",
-              stackName: "SampleEcsStackDeployedFromCodePipeline",
+              actionName: "Deploy-Otter",
+              stackName: "OtterBotStack",
               // this name has to be the same name as used below in the CDK code for the application Stack
               templatePath: cdkCodeBuildOutput.atPath(
-                "EcsStackDeployedInPipeline.template.json"
+                "OtterBotStack.template.json"
               ),
               adminPermissions: true,
               parameterOverrides: {
