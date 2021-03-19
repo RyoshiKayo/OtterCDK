@@ -49,7 +49,7 @@ export class OtterBotStack extends cdk.Stack {
     );
 
     const scaling = fargateService.service.autoScaleTaskCount({
-      maxCapacity: 2,
+      maxCapacity: 1,
     });
 
     scaling.scaleOnMemoryUtilization("MemScaling", {
