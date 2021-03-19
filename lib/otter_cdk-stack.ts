@@ -8,6 +8,7 @@ import * as codebuild from "@aws-cdk/aws-codebuild";
 import * as s3 from "@aws-cdk/aws-s3";
 import * as codepipeline_actions from "@aws-cdk/aws-codepipeline-actions";
 import * as ecr from "@aws-cdk/aws-ecr";
+import * as ddb from "@aws-cdk/aws-dynamodb";
 import { TagParameterContainerImage } from "@aws-cdk/aws-ecs";
 
 export interface OtterBotStackProps extends cdk.StackProps {
@@ -39,8 +40,9 @@ export class OtterBotStack extends cdk.Stack {
           image: props.image,
           environment: {
             DISCORD_BOT_PREFIX: "o!",
-            DISCORD_BOT_OWNER: '132266422679240704',
+            DISCORD_BOT_OWNER: "132266422679240704",
             DISCORD_BOT_TOKEN: discordBotTokenSecret.secretValue.toString(),
+            GUILD_SETTINGS_TABLE_NAME: "OtterGuildSettings",
           },
         },
       }
@@ -57,6 +59,26 @@ export class OtterBotStack extends cdk.Stack {
     scaling.scaleOnCpuUtilization("CpuScaling", {
       targetUtilizationPercent: 90,
     });
+
+    let guildSettingsTable = new ddb.Table(this, "OtterGuildSettingsTable", {
+      partitionKey: {
+        name: "guild",
+        type: ddb.AttributeType.STRING,
+      },
+      tableName: "OtterGuildSettings",
+    });
+
+    guildSettingsTable.addGlobalSecondaryIndex({
+      indexName: "guild_enabled-index",
+      partitionKey: {
+        name: "enabled",
+        type: ddb.AttributeType.NUMBER,
+      },
+    });
+
+    guildSettingsTable.grantReadWriteData(
+      fargateService.service.taskDefinition.taskRole
+    );
   }
 }
 
