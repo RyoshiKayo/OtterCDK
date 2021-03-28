@@ -42,7 +42,7 @@ export class OtterBotStack extends cdk.Stack {
             DISCORD_BOT_PREFIX: "o!",
             DISCORD_BOT_OWNER: "132266422679240704",
             DISCORD_BOT_TOKEN: discordBotTokenSecret.secretValue.toString(),
-            GUILD_SETTINGS_TABLE_NAME: "OtterGuildSettings",
+            DISCORD_BOT_GUILD_SETTINGS_TABLE_NAME: "OtterGuildSettings",
           },
         },
       }
