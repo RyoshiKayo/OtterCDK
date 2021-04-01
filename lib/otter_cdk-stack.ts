@@ -43,6 +43,8 @@ export class OtterBotStack extends cdk.Stack {
             DISCORD_BOT_OWNER: "132266422679240704",
             DISCORD_BOT_TOKEN: discordBotTokenSecret.secretValue.toString(),
             DISCORD_BOT_GUILD_SETTINGS_TABLE_NAME: "OtterGuildSettings",
+            DISCORD_BOT_SHARD_LOCK_TABLE_NAME: "OtterShardLocks",
+            DISCORD_BOT_MAX_SHARD_LOCKS: "4",
           },
         },
       }
@@ -79,6 +81,14 @@ export class OtterBotStack extends cdk.Stack {
     guildSettingsTable.grantReadWriteData(
       fargateService.service.taskDefinition.taskRole
     );
+
+    new ddb.Table(this, "OtterShardLocksTable", {
+      partitionKey: {
+        name: "shardId",
+        type: ddb.AttributeType.STRING,
+      },
+      tableName: "OtterShardLocks",
+    });
   }
 }
 
