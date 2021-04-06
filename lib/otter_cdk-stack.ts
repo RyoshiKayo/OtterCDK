@@ -82,13 +82,17 @@ export class OtterBotStack extends cdk.Stack {
       fargateService.service.taskDefinition.taskRole
     );
 
-    new ddb.Table(this, "OtterShardLocksTable", {
+    const guildShardLocksTable = new ddb.Table(this, "OtterShardLocksTable", {
       partitionKey: {
         name: "shardId",
         type: ddb.AttributeType.STRING,
       },
       tableName: "OtterShardLocks",
     });
+
+    guildShardLocksTable.grantReadWriteData(
+      fargateService.service.taskDefinition.taskRole
+    );
   }
 }
 
