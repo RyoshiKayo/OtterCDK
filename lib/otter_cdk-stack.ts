@@ -52,7 +52,7 @@ export class OtterBotStack extends cdk.Stack {
       }
     );
 
-    fargateService.service.connections.allowInternally(
+    fargateService.service.connections.allowToAnyIpv4(
       Port.tcp(80),
       "Loadbalancer health check"
     );
