@@ -38,6 +38,7 @@ export class OtterBotStack extends cdk.Stack {
         cluster,
         taskImageOptions: {
           image: props.image,
+          containerPort: 80,
           environment: {
             DISCORD_BOT_PREFIX: "o!",
             DISCORD_BOT_OWNER: "132266422679240704",
