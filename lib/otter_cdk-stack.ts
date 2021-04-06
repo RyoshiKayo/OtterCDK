@@ -10,6 +10,7 @@ import * as codepipeline_actions from "@aws-cdk/aws-codepipeline-actions";
 import * as ecr from "@aws-cdk/aws-ecr";
 import * as ddb from "@aws-cdk/aws-dynamodb";
 import { TagParameterContainerImage } from "@aws-cdk/aws-ecs";
+import { Port } from "@aws-cdk/aws-ec2";
 
 export interface OtterBotStackProps extends cdk.StackProps {
   readonly image: ecs.ContainerImage;
@@ -49,6 +50,11 @@ export class OtterBotStack extends cdk.Stack {
           },
         },
       }
+    );
+
+    fargateService.service.connections.allowInternally(
+      Port.tcp(80),
+      "Loadbalancer health check"
     );
 
     const scaling = fargateService.service.autoScaleTaskCount({
