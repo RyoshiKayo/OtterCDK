@@ -32,7 +32,7 @@ export class OtterBotStack extends cdk.Stack {
       }
     );
 
-    const fargateService = new ecs_patterns.NetworkLoadBalancedFargateService(
+    const fargateService = new ecs_patterns.ApplicationLoadBalancedFargateService(
       this,
       "OtterApp",
       {
@@ -50,11 +50,6 @@ export class OtterBotStack extends cdk.Stack {
           },
         },
       }
-    );
-
-    fargateService.service.connections.allowToAnyIpv4(
-      Port.tcp(80),
-      "Loadbalancer health check"
     );
 
     const scaling = fargateService.service.autoScaleTaskCount({
