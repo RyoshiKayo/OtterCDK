@@ -37,6 +37,7 @@ export class OtterBotStack extends cdk.Stack {
       "OtterApp",
       {
         cluster,
+        minHealthyPercent: 0,
         taskImageOptions: {
           image: props.image,
           containerPort: 80,
